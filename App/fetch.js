@@ -14,6 +14,7 @@
  */
 const callGraph = async (username, scopes, uri, interactionType, myMSALObj) => {
     const account = myMSALObj.getAccountByUsername(username);
+    console.log(account)
     try {
         let response = await getGraphClient({
             account: account,

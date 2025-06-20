@@ -44,6 +44,8 @@ function closeModal() {
 }
 
 function updateUI(data, endpoint) {
+    console.log(data);
+
     console.log('Graph API responded at: ' + new Date().toString());
 
     if (endpoint === graphConfig.graphMeEndpoint.uri) {

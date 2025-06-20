@@ -1,4 +1,7 @@
 // Create the main myMSALObj instance
+
+const { graphConfig } = require("./authConfig");
+
 // configuration parameters are located at authConfig.js
 const myMSALObj = new msal.PublicClientApplication(msalConfig);
 
@@ -133,6 +136,7 @@ function signOut() {
 }
 
 function seeProfile() {
+
     callGraph(
         username,
         graphConfig.graphMeEndpoint.scopes,

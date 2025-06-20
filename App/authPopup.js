@@ -12,7 +12,7 @@ let username = '';
 myMSALObj.addEventCallback((event) => {
     if (
         (event.eventType === msal.EventType.LOGIN_SUCCESS ||
-        event.eventType === msal.EventType.ACQUIRE_TOKEN_SUCCESS) &&
+            event.eventType === msal.EventType.ACQUIRE_TOKEN_SUCCESS) &&
         event.payload.account
     ) {
         const account = event.payload.account;
@@ -131,6 +131,7 @@ function signOut() {
 }
 
 function seeProfile() {
+
     callGraph(
         username,
         graphConfig.graphMeEndpoint.scopes,
@@ -145,6 +146,16 @@ function readContacts() {
         username,
         graphConfig.graphContactsEndpoint.scopes,
         graphConfig.graphContactsEndpoint.uri,
+        msal.InteractionType.Popup,
+        myMSALObj
+    );
+}
+
+function getMail() {
+    callGraph(
+        username,
+        graphConfig.graphReadMailEndpoint.scopes,
+        graphConfig.graphReadMailEndpoint.uri,
         msal.InteractionType.Popup,
         myMSALObj
     );
