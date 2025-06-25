@@ -1,3 +1,4 @@
+import { msalConfig } from '../authConfig.js';
 /**
  * This method stores the claim challenge to the localStorage in the browser to be used when acquiring a token
  * @param {String} claimsChallenge
@@ -19,7 +20,7 @@ const getClaimsFromStorage = (claimsChallengeId) => {
  * This method clears localStorage of any claims challenge entry
  * @param {Object} account
  */
-const clearStorage = (account) => {
+export const clearStorage = (account) => {
     for (var key in sessionStorage) {
         if (key.startsWith(`cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}`))
             sessionStorage.removeItem(key);
