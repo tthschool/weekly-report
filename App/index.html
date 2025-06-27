@@ -1,128 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <title>Microsoft identity platform</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
+    <title>Rikkei</title>
     <link rel="SHORTCUT ICON" href="./favicon.svg" type="image/x-icon" />
     <link rel="stylesheet" href="./styles.css" />
-
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
     <!-- msal.min.js can be used in the place of msal.js; included msal.js to make debug easy -->
-    <script id="load-msal" src="https://alcdn.msauth.net/browser/2.31.0/js/msal-browser.js"
-        integrity="sha384-BO4qQ2RTxj2akCJc7t6IdU9aRg6do4LGIkVVa01Hm33jxM+v2G+4q+vZjmOCywYq"
-        crossorigin="anonymous"></script>
+    <script
+      id="load-msal"
+      src="https://alcdn.msauth.net/browser/2.31.0/js/msal-browser.js"
+      integrity="sha384-BO4qQ2RTxj2akCJc7t6IdU9aRg6do4LGIkVVa01Hm33jxM+v2G+4q+vZjmOCywYq"
+      crossorigin="anonymous"
+    ></script>
 
     <!-- adding Graph SDK v2.0 via CDN-->
-    <script type="text/javascript"
-        src="https://cdn.jsdelivr.net/npm/@microsoft/microsoft-graph-client/lib/graph-js-sdk.js"></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/@microsoft/microsoft-graph-client/lib/graph-js-sdk.js"
+    ></script>
 
     <!-- adding Bootstrap 5 for UI components  -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+      crossorigin="anonymous"
+    />
 
-    <link rel="SHORTCUT ICON" href="https://c.s-microsoft.com/favicon.ico?v2" type="image/x-icon" />
-</head>
+    <link
+      rel="SHORTCUT ICON"
+      href="https://c.s-microsoft.com/favicon.ico?v2"
+      type="image/x-icon"
+    />
 
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary navbarStyle">
-        <a class="navbar-brand" href="/">Microsoft identity platform</a>
-        <div class="navbar navbar-collapse justify-content-end">
-            <button type="button" id="SignIn" class="btn btn-secondary" onclick="signIn()">Sign In</button>
-            <div class="dropdown">
-                <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton1"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    Dropdown button
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li>
-                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal">Switch
-                            Account</a>
-                    </li>
-                    <li><a class="dropdown-item" onclick="signOut()" href="#">Sign out</a></li>
-                </ul>
-            </div>
+    <!-- Litepicker CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css"
+    />
+    <!-- Litepicker JS -->
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark navbarStyle">
+      <a class="navbar-brand" href="/">Rikkei</a>
+      <div class="navbar navbar-collapse justify-content-end">
+        <button
+          type="button"
+          id="SignIn"
+          class="btn btn-secondary"
+          onclick="signIn()"
+        >
+          Sign In
+        </button>
+        <div class="dropdown">
+          <button
+            class="btn btn-warning dropdown-toggle"
+            type="button"
+            id="dropdownMenuButton1"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Dropdown button
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li>
+              <a
+                class="dropdown-item"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
+                >Switch Account</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" onclick="signOut()" href="#">Sign out</a>
+            </li>
+          </ul>
         </div>
+      </div>
     </nav>
     <br />
-    <h5 class="card-header text-center">Vanilla JavaScript SPA calling MS Graph API with MSAL.js</h5>
     <br />
-    <div class="row" style="margin: auto">
-        <div id="card-div" class="col-md-3" style="display: none">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title" id="WelcomeMessage">
-                        Please sign-in to see your profile and contacts
-                    </h5>
-                    <div id="profile-div"></div>
-                    <br />
-                    <br />
-                    <button class="btn btn-primary" id="seeProfile" onclick="seeProfile()">See Profile</button>
-                    <br />
-                    <br />
-                    <button class="btn btn-primary" id="readMail" onclick="getMail()">Get Mail</button>
-                    <br />
-                    <br />
-                    <button class="btn btn-primary" id="readMail" onclick="readContacts()">Get contacts</button>
+    <div class="container mt-5">
+      <!-- Search Mail Btn -->
+      <div class="d-flex justify-content-center align-items-center w-100">
+        <button class="mail-btn" id="get_email_btn">
+          <span class="mail-btn-text">メールを取得</span>
+          <span class="btn-icon"><i class="fa-solid fa-envelope"></i></span>
+        </button>
+      </div>
+
+      <div
+        class="filter-area align-items-center justify-content-center gap-3 p-3"
+      >
+        <!-- Mail Status -->
+        <div class="status-group-button">
+          <button class="btn-status sunshine">
+            <span class="btn-text sunshine-text">晴</span>
+            <span class="btn-icon"><i class="fa-solid fa-sun"></i></span>
+          </button>
+          <button class="btn-status cloudy">
+            <span class="btn-text cloudy-text">曇</span>
+            <span class="btn-icon"><i class="fa-solid fa-cloud"></i></span>
+          </button>
+          <button class="btn-status rainy">
+            <span class="btn-text rainy-text">雨</span>
+            <span class="btn-icon"
+              ><i class="fa-solid fa-cloud-showers-water"></i
+            ></span>
+          </button>
+        </div>
+        <div class="date-range-select">
+          <input type="text" id="daterange" readonly />
+        </div>
+
+        <!-- Dropdown -->
+        <div class="me-2">
+          <select class="form-select" id="filter-dropdown">
+            <option value="all">All</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mt-4">
+        <!-- Sidebar bên trái -->
+        <div class="col-md-3 mb-3">
+          <div class="card" id="summary-area" style="display: none">
+            <div
+              class="summary-area card-body text-center d-flex justify-content-center flex-column"
+            >
+              <div class="" style="font-weight: bold">SUMMARY</div>
+              <!-- All Summary -->
+              <div class="d-flex flex-column">
+                <div class="d-flex justify-content-between">
+                  <div>Number of User Submitted:</div>
+                  <div id="user-count">5</div>
                 </div>
+
+                <div class="d-flex justify-content-between">
+                  <div>Number of Report Submitted:</div>
+                  <div id="report-count">2</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div>Submitted Status:</div>
+                  <div id="submitted-status">3/20</div>
+                </div>
+              </div>
+
+              <hr />
+              <!-- Current Selected -->
+              <div class="d-flex flex-column">
+                <div id="selected-user-name" style="font-weight: bold">
+                  asdasdsadsa
+                </div>
+                <div class="d-flex justify-content-between">
+                  <div>Current User Submitted:</div>
+                  <div id="user-count">2</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <i class="fa-solid fa-sun" style="color: #e0a800"></i>
+                  </div>
+                  <div id="report-count">2</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <i
+                      class="fa-solid fa-cloud"
+                      style="color: rgb(153, 153, 247)"
+                    ></i>
+                  </div>
+                  <div id="submitted-status">3/20</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <i
+                      class="fa-solid fa-cloud-showers-water"
+                      style="color: #b52a37"
+                    ></i>
+                  </div>
+                  <div id="submitted-status">4</div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-        <br />
-        <br />
-        <div class="col-md-4">
-            <div class="list-group" id="list-tab" role="tablist"></div>
+        <!-- Main content bên phải -->
+        <div class="col-md-9">
+          <div id="main-content">
+            <div class="card main-card" id="user-card" style="display: none">
+              <div class="card-body" style="padding: 0">
+                <!-- Email list sẽ render ở đây -->
+                <div
+                  id="profile_email"
+                  style="display: none"
+                  class="profile d-flex flex-column align-items-center justify-content-center"
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col-md-5">
-            <div class="tab-content" id="nav-tabContent"></div>
-        </div>
+      </div>
     </div>
     <br />
     <br />
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Set active account</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <ul class="list-group" id="list-group">
-                        <li class="list-group-item" onclick="addAnotherAccount(event)">Add another account</li>
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="closeModal" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Set active account
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group" id="list-group">
+              <li class="list-group-item" onclick="addAnotherAccount(event)">
+                Add another account
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              id="closeModal"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal xem chi tiết mail -->
+    <div
+      class="modal fade"
+      id="mailDetailModal"
+      tabindex="-1"
+      aria-labelledby="mailDetailModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="mailDetailModalLabel">Mail Detail</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="mail-detail-body">
+            <!-- Nội dung chi tiết sẽ được render ở đây -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- importing bootstrap.js and supporting js libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
-        integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
-        crossorigin="anonymous"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
-        crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+      crossorigin="anonymous"
+    ></script>
 
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-        crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+      crossorigin="anonymous"
+    ></script>
 
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@microsoft/microsoft-graph-client@3.0.3/lib/graph-js-sdk.js"></script>
     <!-- importing app scripts (load order is important) -->
-    <script type="text/javascript" src="./authConfig.js"></script>
-    <script type="text/javascript" src="./ui.js"></script>
-
-    <!-- <script type="text/javascript" src="./authRedirect.js"></script> -->
-    <!-- uncomment the above line and comment the line below if you would like to use the redirect flow -->
-    <script type="text/javascript" src="./authPopup.js"></script>
-    <script type="text/javascript" src="./graph.js"></script>
-    <script type="text/javascript" src="./utils/storageUtils.js"></script>
-    <script type="text/javascript" src="./fetch.js"></script>
-</body>
-
+    <script type="module" src="./authConfig.js"></script>
+    <script type="module" src="./main.js"></script>
+    <script type="module" src="./components/uiHandler.js"></script>
+    <script type="module" src="./authPopup.js"></script>
+    <script type="module" src="./graph.js"></script>
+    <script type="module" src="./utils/storageUtils.js"></script>
+    <script type="module" src="./fetch.js"></script>
+  </body>
 </html>

@@ -2,7 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
 
-const DEFAULT_PORT = process.env.PORT || 3001;
+const DEFAULT_PORT = process.env.PORT || 3003;
 
 // initialize express.
 const app = express();
