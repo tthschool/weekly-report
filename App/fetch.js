@@ -18,26 +18,24 @@ const callGraph = async (username, scopes, uri, interactionType, myMSALObj) => {
   const account = myMSALObj.getAccountByUsername(username);
   let tokenResponse;
   try {
-    // tokenResponse = await myMSALObj.acquireTokenSilent({
-    //   account: account,
-    //   scopes: scopes,
-    // });
+    tokenResponse = await myMSALObj.acquireTokenSilent({
+      account: account,
+      scopes: scopes,
+    });
 
-    // if (interactionType === msal.InteractionType.Popup) {
-    //   tokenResponse = await myMSALObj.acquireTokenPopup({
-    //     scopes: scopes,
-    //   });
-    // } else if (interactionType === msal.InteractionType.Redirect) {
-    //   myMSALObj.acquireTokenRedirect({
-    //     scopes: scopes,
-    //   });
-    //   return; // Redirect sẽ điều hướng, không cần tiếp tục
-    // } else {
-    //   throw new Error("Unsupported interaction type");
-    // }
-
-    const client = getGraphClient("");
-
+    if (interactionType === msal.InteractionType.Popup) {
+      tokenResponse = await myMSALObj.acquireTokenPopup({
+        scopes: scopes,
+      });
+    } else if (interactionType === msal.InteractionType.Redirect) {
+      myMSALObj.acquireTokenRedirect({
+        scopes: scopes,
+      });
+      return; // Redirect sẽ điều hướng, không cần tiếp tục
+    } else {
+      throw new Error("Unsupported interaction type");
+    }
+    const client = getGraphClient(tokenResponse.accessToken);
     const response = await client.api(uri).get();
     return response;
   } catch (error) {
@@ -45,14 +43,14 @@ const callGraph = async (username, scopes, uri, interactionType, myMSALObj) => {
       const resource = new URL(uri).hostname;
       const claims =
         account &&
-        getClaimsFromStorage(
-          `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${resource}`
-        )
+          getClaimsFromStorage(
+            `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${resource}`
+          )
           ? window.atob(
-              getClaimsFromStorage(
-                `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${resource}`
-              )
+            getClaimsFromStorage(
+              `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${resource}`
             )
+          )
           : undefined; // e.g {"access_token":{"xms_cc":{"values":["cp1"]}}}
       let request = {
         account: account,
@@ -106,8 +104,7 @@ const handleClaimsChallenge = async (account, response, apiEndpoint) => {
        */
       addClaimsToStorage(
         claimsChallenge.claims,
-        `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${
-          new URL(apiEndpoint).hostname
+        `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${new URL(apiEndpoint).hostname
         }`
       );
       return {
