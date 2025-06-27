@@ -18,25 +18,25 @@ const callGraph = async (username, scopes, uri, interactionType, myMSALObj) => {
   const account = myMSALObj.getAccountByUsername(username);
   let tokenResponse;
   try {
-    tokenResponse = await myMSALObj.acquireTokenSilent({
-      account: account,
-      scopes: scopes,
-    });
+    // tokenResponse = await myMSALObj.acquireTokenSilent({
+    //   account: account,
+    //   scopes: scopes,
+    // });
 
-    if (interactionType === msal.InteractionType.Popup) {
-      tokenResponse = await myMSALObj.acquireTokenPopup({
-        scopes: scopes,
-      });
-    } else if (interactionType === msal.InteractionType.Redirect) {
-      myMSALObj.acquireTokenRedirect({
-        scopes: scopes,
-      });
-      return; // Redirect sẽ điều hướng, không cần tiếp tục
-    } else {
-      throw new Error("Unsupported interaction type");
-    }
+    // if (interactionType === msal.InteractionType.Popup) {
+    //   tokenResponse = await myMSALObj.acquireTokenPopup({
+    //     scopes: scopes,
+    //   });
+    // } else if (interactionType === msal.InteractionType.Redirect) {
+    //   myMSALObj.acquireTokenRedirect({
+    //     scopes: scopes,
+    //   });
+    //   return; // Redirect sẽ điều hướng, không cần tiếp tục
+    // } else {
+    //   throw new Error("Unsupported interaction type");
+    // }
 
-    const client = getGraphClient(tokenResponse);
+    const client = getGraphClient("");
 
     const response = await client.api(uri).get();
     return response;

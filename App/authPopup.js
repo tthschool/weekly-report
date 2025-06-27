@@ -137,31 +137,11 @@ export function signOut() {
   });
 }
 
-export function seeProfile() {
-  return callGraph(
-    username,
-    graphConfig.graphMeEndpoint.scopes,
-    graphConfig.graphMeEndpoint.uri,
-    msal.InteractionType.Popup,
-    myMSALObj
-  );
-}
-
-export function readContacts() {
-  return callGraph(
-    username,
-    graphConfig.graphContactsEndpoint.scopes,
-    graphConfig.graphContactsEndpoint.uri,
-    msal.InteractionType.Popup,
-    myMSALObj
-  );
-}
-
 export async function getMail() {
   return await callGraph(
     username,
     ["User.Read", "Mail.Read"],
-    "/me/messages",
+    '/me/messages?$search="subject:週報"',
     msal.InteractionType.Popup,
     myMSALObj
   );

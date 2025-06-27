@@ -6,10 +6,13 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
     />
-    <title>Microsoft identity platform</title>
+    <title>Rikkei</title>
     <link rel="SHORTCUT ICON" href="./favicon.svg" type="image/x-icon" />
     <link rel="stylesheet" href="./styles.css" />
-
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
     <!-- msal.min.js can be used in the place of msal.js; included msal.js to make debug easy -->
     <script
       id="load-msal"
@@ -37,11 +40,19 @@
       href="https://c.s-microsoft.com/favicon.ico?v2"
       type="image/x-icon"
     />
+
+    <!-- Litepicker CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css"
+    />
+    <!-- Litepicker JS -->
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
   </head>
 
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary navbarStyle">
-      <a class="navbar-brand" href="/">Microsoft identity platform</a>
+    <nav class="navbar navbar-expand-lg navbar-dark navbarStyle">
+      <a class="navbar-brand" href="/">Rikkei</a>
       <div class="navbar navbar-collapse justify-content-end">
         <button
           type="button"
@@ -80,29 +91,125 @@
     <br />
     <br />
     <div class="container mt-5">
-      <div class="row">
+      <!-- Search Mail Btn -->
+      <div class="d-flex justify-content-center align-items-center w-100">
+        <button class="mail-btn" id="get_email_btn">
+          <span class="mail-btn-text">メールを取得</span>
+          <span class="btn-icon"><i class="fa-solid fa-envelope"></i></span>
+        </button>
+      </div>
+
+      <div
+        class="filter-area align-items-center justify-content-center gap-3 p-3"
+      >
+        <!-- Mail Status -->
+        <div class="status-group-button">
+          <button class="btn-status sunshine">
+            <span class="btn-text sunshine-text">晴</span>
+            <span class="btn-icon"><i class="fa-solid fa-sun"></i></span>
+          </button>
+          <button class="btn-status cloudy">
+            <span class="btn-text cloudy-text">曇</span>
+            <span class="btn-icon"><i class="fa-solid fa-cloud"></i></span>
+          </button>
+          <button class="btn-status rainy">
+            <span class="btn-text rainy-text">雨</span>
+            <span class="btn-icon"
+              ><i class="fa-solid fa-cloud-showers-water"></i
+            ></span>
+          </button>
+        </div>
+        <div class="date-range-select">
+          <input type="text" id="daterange" readonly />
+        </div>
+
+        <!-- Dropdown -->
+        <div class="me-2">
+          <select class="form-select" id="filter-dropdown">
+            <option value="all">All</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mt-4">
         <!-- Sidebar bên trái -->
-        <div class="col-md-3">
-          <div class="d-flex flex-column align-items-stretch gap-3">
-            <button
-              class="btn btn-primary mb-2"
-              id="get_email_btn"
+        <div class="col-md-3 mb-3">
+          <div class="card" id="summary-area" style="display: none">
+            <div
+              class="summary-area card-body text-center d-flex justify-content-center flex-column"
             >
-              Get Mail
-            </button>
+              <div class="" style="font-weight: bold">SUMMARY</div>
+              <!-- All Summary -->
+              <div class="d-flex flex-column">
+                <div class="d-flex justify-content-between">
+                  <div>Number of User Submitted:</div>
+                  <div id="user-count">5</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div>Number of Report Submitted:</div>
+                  <div id="report-count">2</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div>Submitted Status:</div>
+                  <div id="submitted-status">3/20</div>
+                </div>
+              </div>
+
+              <hr />
+              <!-- Current Selected -->
+              <div class="d-flex flex-column">
+                <div id="selected-user-name" style="font-weight: bold">
+                  asdasdsadsa
+                </div>
+                <div class="d-flex justify-content-between">
+                  <div>Current User Submitted:</div>
+                  <div id="user-count">2</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <i class="fa-solid fa-sun" style="color: #e0a800"></i>
+                  </div>
+                  <div id="report-count">2</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <i
+                      class="fa-solid fa-cloud"
+                      style="color: rgb(153, 153, 247)"
+                    ></i>
+                  </div>
+                  <div id="submitted-status">3/20</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <i
+                      class="fa-solid fa-cloud-showers-water"
+                      style="color: #b52a37"
+                    ></i>
+                  </div>
+                  <div id="submitted-status">4</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <!-- Main content bên phải -->
         <div class="col-md-9">
           <div id="main-content">
-            <div class="card" id="user-card" style="width: 100%; height: 450px">
-              <div id="profile_email" style="display: none" class="profile d-flex flex-column align-items-center justify-content-center">
-                Welcome to your profile
-              </div>
-              
+            <div class="card main-card" id="user-card" style="display: none">
+              <div class="card-body" style="padding: 0">
+                <!-- Email list sẽ render ở đây -->
+                <div
+                  id="profile_email"
+                  style="display: none"
+                  class="profile d-flex flex-column align-items-center justify-content-center"
+                ></div>
               </div>
             </div>
-            <!-- Nội dung profile/mail/contacts sẽ render ở đây -->
           </div>
         </div>
       </div>
@@ -152,6 +259,32 @@
       </div>
     </div>
 
+    <!-- Modal xem chi tiết mail -->
+    <div
+      class="modal fade"
+      id="mailDetailModal"
+      tabindex="-1"
+      aria-labelledby="mailDetailModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="mailDetailModalLabel">Mail Detail</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="mail-detail-body">
+            <!-- Nội dung chi tiết sẽ được render ở đây -->
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- importing bootstrap.js and supporting js libraries -->
 
     <script
@@ -171,18 +304,14 @@
       integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
       crossorigin="anonymous"
     ></script>
-<script src="https://cdn.jsdelivr.net/npm/@microsoft/microsoft-graph-client@3.0.3/lib/graph-js-sdk.js"></script>    <!-- importing app scripts (load order is important) -->
+    <script src="https://cdn.jsdelivr.net/npm/@microsoft/microsoft-graph-client@3.0.3/lib/graph-js-sdk.js"></script>
+    <!-- importing app scripts (load order is important) -->
     <script type="module" src="./authConfig.js"></script>
     <script type="module" src="./main.js"></script>
     <script type="module" src="./components/uiHandler.js"></script>
-
-    <!-- <script type="text/javascript" src="./authRedirect.js"></script> -->
-    <!-- uncomment the above line and comment the line below if you would like to use the redirect flow -->
     <script type="module" src="./authPopup.js"></script>
     <script type="module" src="./graph.js"></script>
     <script type="module" src="./utils/storageUtils.js"></script>
     <script type="module" src="./fetch.js"></script>
-
-    </script>
   </body>
 </html>
