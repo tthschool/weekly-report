@@ -59,47 +59,6 @@ function selectAccount() {
   }
 }
 
-async function addAnotherAccount(event) {
-  if (event.target.innerHTML.includes("@")) {
-    const username = event.target.innerHTML;
-    const account = myMSALObj
-      .getAllAccounts()
-      .find((account) => account.username === username);
-    const activeAccount = myMSALObj.getActiveAccount();
-    if (account && activeAccount.homeAccountId != account.homeAccountId) {
-      try {
-        myMSALObj.setActiveAccount(account);
-        let res = await myMSALObj.ssoSilent({
-          ...loginRequest,
-          account: account,
-        });
-        handleResponse(res);
-        closeModal();
-        window.location.reload();
-      } catch (error) {
-        if (error instanceof msal.InteractionRequiredAuthError) {
-          await myMSALObj.loginRedirect({
-            ...loginRequest,
-            prompt: "login",
-          });
-        }
-      }
-    } else {
-      closeModal();
-    }
-  } else {
-    try {
-      myMSALObj.setActiveAccount(null);
-      await myMSALObj.loginRedirect({
-        ...loginRequest,
-        prompt: "login",
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-}
-
 function handleResponse(response) {
   if (response !== null) {
     const accounts = myMSALObj.getAllAccounts();

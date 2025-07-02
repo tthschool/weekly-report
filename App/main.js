@@ -1,2 +1,2 @@
-import { setupUI } from './components/uiHandler.js';
+import { setupUI } from "./components/uiHandler.js";
 setupUI();

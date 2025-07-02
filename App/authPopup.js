@@ -137,12 +137,11 @@ export function signOut() {
   });
 }
 
-
 export async function getMail() {
   return await callGraph(
     username,
-    ["User.Read", "Mail.Read"],
-    `https://graph.microsoft.com/v1.0/me/mailFolders('Inbox')/messages?$search="subject:週報"`,
+    graphConfig.graphReadMailEndpoint.scopes,
+    graphConfig.graphReadMailEndpoint.uri,
     msal.InteractionType.Popup,
     myMSALObj
   );

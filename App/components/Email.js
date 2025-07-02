@@ -1,30 +1,35 @@
+import CONSTANT from "../utils/constants.js";
+
 export function renderEmailList(mailData) {
   if (!mailData || !mailData.value || mailData.value.length === 0) {
-    return `<div>No mail data</div>`;
+    return CONSTANT.NO_MAIL_DISPLAY;
   }
 
-  let html = `<div class="email-list" style="max-height:360px;overflow-y:auto;padding-right:8px;">`;
+  let listMailHtml = CONSTANT.LIST_MAIL_HTML;
 
   mailData.value.forEach((mail, idx) => {
-    const isSunny = mail.subject && mail.subject.includes("晴");
-    const isCloudy = mail.subject && mail.subject.includes("曇");
-    const isRainy = mail.subject && mail.subject.includes("雨");
+    const isSunny =
+      mail.subject && mail.subject.includes(CONSTANT.MAIL_STATUS.SUNNY);
+    const isCloudy =
+      mail.subject && mail.subject.includes(CONSTANT.MAIL_STATUS.CLOUDY);
+    const isRainy =
+      mail.subject && mail.subject.includes(CONSTANT.MAIL_STATUS.RAINY);
 
     const username = mail.from?.emailAddress?.address;
     let colorBackground = "white";
     let textColor = "black";
     if (isSunny) {
-      colorBackground = "#ffc107"; // vàng cam
+      colorBackground = CONSTANT.STATUS_COLOR.SUNNY;
     }
     if (isCloudy) {
-      colorBackground = "rgb(153, 153, 247)"; // xám
+      colorBackground = CONSTANT.STATUS_COLOR.CLOUDY;
       textColor = "white";
     }
     if (isRainy) {
-      colorBackground = "#dc3545"; // đỏ
+      colorBackground = CONSTANT.STATUS_COLOR.RAINY;
       textColor = "white";
     }
-    html += `
+    listMailHtml += `
       <div class="card mb-3 mail-card" data-index="${idx}" style="cursor:pointer;background:${colorBackground};color:${textColor};">
         <div class="card-body">
           <div class="card-title" style="font-size:1.2rem;font-weight:bold;">
@@ -44,8 +49,8 @@ export function renderEmailList(mailData) {
       </div>
     `;
   });
-  html += `</div>`;
-  return html;
+  listMailHtml += `</div>`;
+  return listMailHtml;
 }
 
 // List nguoi gui unique

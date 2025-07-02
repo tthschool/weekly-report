@@ -1,9 +1,3 @@
-/*
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License.
- */
-
-import { updateUI } from "./components/uiHandler.js";
 import { getGraphClient } from "./graph.js";
 /**
  * This method calls the Graph API by utilizing the graph client instance.
@@ -43,14 +37,14 @@ const callGraph = async (username, scopes, uri, interactionType, myMSALObj) => {
       const resource = new URL(uri).hostname;
       const claims =
         account &&
-          getClaimsFromStorage(
-            `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${resource}`
-          )
+        getClaimsFromStorage(
+          `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${resource}`
+        )
           ? window.atob(
-            getClaimsFromStorage(
-              `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${resource}`
+              getClaimsFromStorage(
+                `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${resource}`
+              )
             )
-          )
           : undefined; // e.g {"access_token":{"xms_cc":{"values":["cp1"]}}}
       let request = {
         account: account,
@@ -71,8 +65,6 @@ const callGraph = async (username, scopes, uri, interactionType, myMSALObj) => {
           await myMSALObj.acquireTokenRedirect(request);
           break;
       }
-    } else if (error.toString().includes("404")) {
-      return updateUI(null, uri, account);
     } else {
       console.log(error);
     }
@@ -104,7 +96,8 @@ const handleClaimsChallenge = async (account, response, apiEndpoint) => {
        */
       addClaimsToStorage(
         claimsChallenge.claims,
-        `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${new URL(apiEndpoint).hostname
+        `cc.${msalConfig.auth.clientId}.${account.idTokenClaims.oid}.${
+          new URL(apiEndpoint).hostname
         }`
       );
       return {

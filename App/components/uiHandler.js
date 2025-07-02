@@ -1,42 +1,40 @@
 import { renderEmailList, getUniqueSenders } from "./Email.js";
-import { graphConfig } from "../authConfig.js";
 import { getMail } from "../authPopup.js";
+import CONSTANT from "../utils/constants.js";
 
-// Đặt các biến này ở ngoài cùng file
 let cachedMailData = null;
+let uniqueSenders = null;
 let profileEmailDiv = null;
 let senderDropdown = null;
 
-export function setupUI() {
-  const regex = /\[週報：\s*(晴|曇|雨)\s*\/\s*[1-3]\]/; // right
-  const getEmailBtn = document.getElementById("get_email_btn");
-  const summaryArea = document.getElementById("summary-area");
-  const mainCard = document.querySelector(".main-card");
-  const filterArea = document.querySelector(".filter-area");
+const divider = document.getElementById("sum-divider");
+const regex = CONSTANT.REGEX_MAIL;
+const getEmailBtn = document.getElementById("get_email_btn");
+const summaryArea = document.getElementById("summary-area");
+const mainCard = document.querySelector(".main-card");
+const filterArea = document.querySelector(".filter-area");
+const summaryDiv = document.getElementById("current-selected-summary");
 
-  // Gán lại các biến này khi DOM đã sẵn sàng
+// ===================== UI SETUP =====================
+export function setupUI() {
   profileEmailDiv = document.getElementById("profile_email");
   senderDropdown = document.getElementById("filter-dropdown");
 
   getEmailBtn.addEventListener("click", async () => {
+    summaryDiv.style.display = "none";
+    divider.style.display = "none";
     try {
       profileEmailDiv.innerHTML = "";
       getEmailBtn.style.display = "none";
       // GET EMAIL
       let mailData = await getMail();
-      const uniqueSenders = getUniqueSenders(mailData);
+      uniqueSenders = getUniqueSenders(mailData);
 
-      if (summaryArea) {
-        summaryArea.style.display = "block";
-      }
-      if (mainCard) {
-        mainCard.style.display = "block";
-      }
-      if (filterArea) {
-        filterArea.style.display = "flex";
-      }
+      if (summaryArea) summaryArea.style.display = "block";
+      if (mainCard) mainCard.style.display = "block";
+      if (filterArea) filterArea.style.display = "flex";
 
-      // Set unique user in dropdown
+      // Add unique user to dropdown
       if (senderDropdown) {
         uniqueSenders.forEach((sender) => {
           const option = document.createElement("option");
@@ -45,39 +43,31 @@ export function setupUI() {
           senderDropdown.appendChild(option);
         });
       }
-      // Lọc kết quả ở phía client
+
+      // Filter and index mail
       mailData.value = mailData.value.filter((mail) =>
         regex.test(mail.subject)
       );
+      mailData.value.forEach((mail, idx) => (mail.index = idx));
+      cachedMailData = { ...mailData, value: [...mailData.value] };
 
-      // Gán index gốc cho từng mail (dựa trên vị trí trong mảng gốc)
-      mailData.value.forEach((mail, idx) => {
-        mail.index = idx;
-      });
-
-      cachedMailData = {
-        ...mailData,
-        value: [...mailData.value], // giữ nguyên cấu trúc
-      };
+      updateSummaryUI(cachedMailData, uniqueSenders);
       profileEmailDiv.innerHTML = renderEmailList(cachedMailData);
       attachMailCardEvents(cachedMailData);
     } catch (err) {
       profileEmailDiv.innerHTML = `<div>Error fetching mail: ${err.message}</div>`;
     }
-
     profileEmailDiv.style.display = "flex";
   });
 
-  // Group button
+  // Status group button
   document.querySelectorAll(".sunshine, .cloudy, .rainy").forEach((btn) => {
     btn.addEventListener("click", function () {
-      // Nếu nút đang active được click lại
       if (this.classList.contains("active")) {
         this.classList.remove("active");
         filterMail();
         return;
       }
-      // Bỏ active ở tất cả nút, set active cho nút vừa click
       document
         .querySelectorAll(".sunshine, .cloudy, .rainy")
         .forEach((b) => b.classList.remove("active"));
@@ -94,142 +84,125 @@ export function setupUI() {
   }
 }
 
+// ===================== DROPDOWN AREA =====================
+document
+  .getElementById("filter-dropdown")
+  .addEventListener("change", function (e) {
+    const selected = e.target.value;
+    if (selected === "all") {
+      // Ẩn và reset các trường khi chọn All
+      summaryDiv.style.display = "none";
+      divider.style.display = "none";
+      document.getElementById("selected-user-name").textContent = "";
+      document.getElementById("selected-report-count").textContent = "";
+      document.getElementById("sunny-report-count").textContent = "";
+      document.getElementById("cloudy-report-count").textContent = "";
+      document.getElementById("rainy-report-count").textContent = "";
+    } else {
+      divider.style.display = "block";
+      summaryDiv.style.display = "flex";
+      summaryDiv.style.flexDirection = "column";
+      const userData = (() => {
+        if (!cachedMailData || !cachedMailData.value) return null;
+        const sender = uniqueSenders.find((s) => s === selected);
+        if (!sender) return null;
+        const mails = cachedMailData.value.filter(
+          (mail) => mail.from?.emailAddress?.address === sender
+        );
+        return {
+          name: sender,
+          submitted: mails.length,
+          sunnyReport: mails.filter((mail) =>
+            mail.subject?.includes(CONSTANT.MAIL_STATUS.SUNNY)
+          ).length,
+          cloudyReport: mails.filter((mail) =>
+            mail.subject?.includes(CONSTANT.MAIL_STATUS.CLOUDY)
+          ).length,
+          rainyReport: mails.filter((mail) =>
+            mail.subject?.includes(CONSTANT.MAIL_STATUS.RAINY)
+          ).length,
+        };
+      })();
+      showSelectedUserSummary(userData);
+    }
+  });
+
+// ===================== WELCOME MESSAGE =====================
 export function showWelcomeMessage(username, accounts) {
   const welcomeDiv = document.getElementById("WelcomeMessage");
   const signInButton = document.getElementById("SignIn");
   const dropdownButton = document.getElementById("dropdownMenuButton1");
-  const listGroup = document.getElementById("list-group");
 
-  if (signInButton) {
-    signInButton.style.visibility = "hidden";
-  }
-
-  if (welcomeDiv) {
-    welcomeDiv.innerHTML = `Welcome ${username}`;
-  }
+  if (signInButton) signInButton.style.visibility = "hidden";
+  if (welcomeDiv) welcomeDiv.innerHTML = `Welcome ${username}`;
   dropdownButton.setAttribute(
     "style",
     "display:inline !important; visibility:visible"
   );
   dropdownButton.innerHTML = username;
+
   accounts.forEach((account) => {
     let item = document.getElementById(account.username);
     if (!item) {
       const listItem = document.createElement("li");
-      listItem.setAttribute("onclick", "addAnotherAccount(event)");
       listItem.setAttribute("id", account.username);
       listItem.innerHTML = account.username;
-      if (account.username === username) {
-        listItem.setAttribute("class", "list-group-item active");
-      } else {
-        listItem.setAttribute("class", "list-group-item");
-      }
-      listGroup.appendChild(listItem);
+      listItem.setAttribute(
+        "class",
+        account.username === username
+          ? "list-group-item active"
+          : "list-group-item"
+      );
     } else {
-      if (account.username === username) {
-        item.setAttribute("class", "list-group-item active");
-      } else {
-        item.setAttribute("active", "list-group-item");
-      }
+      item.setAttribute(
+        "class",
+        account.username === username
+          ? "list-group-item active"
+          : "list-group-item"
+      );
     }
   });
 }
 
+// ===================== MODAL =====================
 export function closeModal() {
   const element = document.getElementById("closeModal");
   element.click();
 }
 
-export function updateUI(data, endpoint, account) {
-  if (endpoint === graphConfig.graphMeEndpoint.uri) {
-  } else if (endpoint === graphConfig.graphContactsEndpoint.uri) {
-    if (!data || data.value.length < 1) {
-      alert("Your contacts is empty!");
-    } else {
-      const tabList = document.getElementById("list-tab");
-      tabList.innerHTML = ""; // clear tabList at each readMail call
-
-      data.value.map((d, i) => {
-        if (i < 10) {
-          const listItem = document.createElement("a");
-          listItem.setAttribute(
-            "class",
-            "list-group-item list-group-item-action"
-          );
-          listItem.setAttribute("id", "list" + i + "list");
-          listItem.setAttribute("data-toggle", "list");
-          listItem.setAttribute("href", "#list" + i);
-          listItem.setAttribute("role", "tab");
-          listItem.setAttribute("aria-controls", i);
-          listItem.innerHTML =
-            "<strong> Name: " +
-            d.displayName +
-            "</strong><br><br>" +
-            "Note: " +
-            d.personalNotes +
-            "...";
-          tabList.appendChild(listItem);
-        }
-      });
-    }
-  } else if (endpoint === graphConfig.graphReadMailEndpoint.uri) {
-    if (!data || data.value.length < 1) {
-      alert("Your mailbox is empty!");
-    } else {
-      const userCard = document.getElementById("user-card");
-      // if (userCard) {
-      //  userCard.innerHTML = "";
-      // }
-      // clear tabList at each readMail call
-
-      data.value.map((mail, i) => {
-        if (i < 10) {
-          const listItem = document.createElement("a");
-          listItem.setAttribute(
-            "class",
-            "list-group-item list-group-item-action"
-          );
-          listItem.setAttribute("id", "list" + i + "list");
-          listItem.setAttribute("data-toggle", "list");
-          listItem.setAttribute("href", "#list" + i);
-          listItem.setAttribute("role", "tab");
-          listItem.setAttribute("aria-controls", i);
-          listItem.innerHTML =
-            "<strong> Subject: " +
-            mail.subject +
-            "</strong><br><br>" +
-            "From: " +
-            mail.from.emailAddress.name +
-            "<br><br>" +
-            "To: " +
-            mail.toRecipients[0].emailAddress.name +
-            "...";
-          userCard.appendChild(listItem);
-        }
-      });
-    }
-  }
-}
-
-// Hàm filterMail dùng được các biến toàn cục
+// ===================== FILTER MAIL =====================
 function filterMail() {
   if (!cachedMailData) return;
 
-  // Lấy trạng thái đang active
   let filterText = "";
   const activeBtn = document.querySelector(
     ".sunshine.active, .cloudy.active, .rainy.active"
   );
   if (activeBtn) {
-    if (activeBtn.classList.contains("sunshine")) filterText = "晴";
-    if (activeBtn.classList.contains("cloudy")) filterText = "曇";
-    if (activeBtn.classList.contains("rainy")) filterText = "雨";
+    if (activeBtn.classList.contains("sunshine"))
+      filterText = CONSTANT.MAIL_STATUS.SUNNY;
+    if (activeBtn.classList.contains("cloudy"))
+      filterText = CONSTANT.MAIL_STATUS.CLOUDY;
+    if (activeBtn.classList.contains("rainy"))
+      filterText = CONSTANT.MAIL_STATUS.RAINY;
   }
 
-  // Lấy người gửi đang chọn
   const selectedSender = senderDropdown ? senderDropdown.value : "all";
+  const period = document.getElementById("date-range").value;
+  let startDate = null,
+    endDate = null;
+  if (period && period.includes(" - ")) {
+    const [start, end] = period.split(" - ");
+    startDate = new Date(start.trim());
+    endDate = new Date(end.trim());
+    endDate.setHours(
+      CONSTANT.END_OF_DAY.hours,
+      CONSTANT.END_OF_DAY.minutes,
+      CONSTANT.END_OF_DAY.seconds,
+      CONSTANT.END_OF_DAY.ms
+    );
+  }
 
-  // Lọc mail theo cả hai điều kiện
   const filteredMail = {
     ...cachedMailData,
     value: cachedMailData.value.filter((mail) => {
@@ -240,19 +213,24 @@ function filterMail() {
         selectedSender && selectedSender !== "all"
           ? mail.from?.emailAddress?.address === selectedSender
           : true;
-      return matchStatus && matchSender;
+      const matchDate =
+        startDate && endDate && mail.receivedDateTime
+          ? new Date(mail.receivedDateTime) >= startDate &&
+            new Date(mail.receivedDateTime) <= endDate
+          : true;
+      return matchStatus && matchSender && matchDate;
     }),
   };
 
   profileEmailDiv.innerHTML = renderEmailList(filteredMail);
-  attachMailCardEvents(filteredMail); // <-- Thêm dòng này
+  attachMailCardEvents(filteredMail);
 }
 
+// ===================== MAIL CARD EVENTS =====================
 function attachMailCardEvents(mailData) {
   setTimeout(() => {
     document.querySelectorAll(".mail-card").forEach((card, i) => {
       card.addEventListener("click", function () {
-        // Lấy mail đúng theo vị trí trong mảng filter hiện tại
         const idx = this.getAttribute("data-index");
         const mail = mailData.value[idx];
         document.getElementById("mail-detail-body").innerHTML = `
@@ -264,7 +242,6 @@ function attachMailCardEvents(mailData) {
               : ""
           }</div>
           <hr>
-          <div><b>Body:</b></div>
           <div class="mail-body-content">${
             mail.body?.content || "(No content)"
           }</div>
@@ -278,29 +255,46 @@ function attachMailCardEvents(mailData) {
   }, 0);
 }
 
+// ===================== DATE TIME PICKER AREA =====================
 document.addEventListener("DOMContentLoaded", function () {
   const today = new Date();
   const lastWeek = new Date();
   lastWeek.setDate(today.getDate() - 7);
   const picker = new Litepicker({
-    element: document.getElementById("daterange"),
-    singleMode: false,
-    format: "YYYY/MM/DD",
-    numberOfMonths: 1,
-    numberOfColumns: 1,
-    autoApply: false,
-    showTooltip: true,
+    element: document.getElementById("date-range"),
     startDate: lastWeek,
-    endDate: new Date(),
-    tooltipText: {
-      one: "Selected Day",
-      other: "Selected Days",
-    },
-    dropdowns: {
-      minYear: 2020,
-      maxYear: 2030,
-      months: true,
-      years: true,
-    },
+    endDate: today,
+    ...CONSTANT.LITEPICKER_CONFIG,
+  });
+
+  picker.on("selected", function () {
+    filterMail();
+  });
+  picker.on("cancel", function () {
+    document.getElementById("date-range").value = "";
+    filterMail();
   });
 });
+
+// ===================== USER SUMMARY AREA =====================
+export function updateSummaryUI(data, uniqueSenders) {
+  document.getElementById("user-count").textContent = uniqueSenders.length;
+  document.getElementById("report-count").textContent = data.value.length;
+}
+
+export function showSelectedUserSummary(userData) {
+  if (!userData) {
+    document.getElementById("current-selected-summary").style.display = "none";
+    return;
+  }
+  document.getElementById("current-selected-summary").style.display = "flex";
+  document.getElementById("selected-user-name").textContent = userData.name;
+  document.getElementById("selected-report-count").textContent =
+    userData.submitted;
+  document.getElementById("sunny-report-count").textContent =
+    userData.sunnyReport;
+  document.getElementById("cloudy-report-count").textContent =
+    userData.cloudyReport;
+  document.getElementById("rainy-report-count").textContent =
+    userData.rainyReport;
+}

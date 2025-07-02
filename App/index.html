@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
     />
-    <title>Rikkei</title>
+    <title>Weekly Report</title>
     <link rel="SHORTCUT ICON" href="./favicon.svg" type="image/x-icon" />
     <link rel="stylesheet" href="./styles.css" />
     <link
@@ -52,7 +52,13 @@
 
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark navbarStyle">
-      <a class="navbar-brand" href="/">Rikkei</a>
+      <a class="navbar-brand d-flex align-items-center" href="/">
+        <img
+          src="./assets/rikkei-logo.jpg"
+          class="company-logo"
+          alt="Rikkei Logo"
+        />
+      </a>
       <div class="navbar navbar-collapse justify-content-end">
         <button
           type="button"
@@ -60,7 +66,7 @@
           class="btn btn-secondary"
           onclick="signIn()"
         >
-          Sign In
+          ログイン
         </button>
         <div class="dropdown">
           <button
@@ -74,15 +80,9 @@
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
             <li>
-              <a
-                class="dropdown-item"
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
-                >Switch Account</a
+              <a class="dropdown-item" onclick="signOut()" href="#"
+                >ログアウト</a
               >
-            </li>
-            <li>
-              <a class="dropdown-item" onclick="signOut()" href="#">Sign out</a>
             </li>
           </ul>
         </div>
@@ -90,7 +90,7 @@
     </nav>
     <br />
     <br />
-    <div class="container mt-5">
+    <div class="container">
       <!-- Search Mail Btn -->
       <div class="d-flex justify-content-center align-items-center w-100">
         <button class="mail-btn" id="get_email_btn">
@@ -103,106 +103,103 @@
         class="filter-area align-items-center justify-content-center gap-3 p-3"
       >
         <!-- Mail Status -->
-        <div class="status-group-button">
-          <button class="btn-status sunshine">
+        <div class="status-group-button filter-area-btn">
+          <button class="btn-status sunshine shadow-box">
             <span class="btn-text sunshine-text">晴</span>
             <span class="btn-icon"><i class="fa-solid fa-sun"></i></span>
           </button>
-          <button class="btn-status cloudy">
+          <button class="btn-status cloudy shadow-box">
             <span class="btn-text cloudy-text">曇</span>
             <span class="btn-icon"><i class="fa-solid fa-cloud"></i></span>
           </button>
-          <button class="btn-status rainy">
+          <button class="btn-status rainy shadow-box">
             <span class="btn-text rainy-text">雨</span>
             <span class="btn-icon"
               ><i class="fa-solid fa-cloud-showers-water"></i
             ></span>
           </button>
         </div>
-        <div class="date-range-select">
-          <input type="text" id="daterange" readonly />
+        <div class="date-range-select filter-area-btn shadow-box">
+          <label for="date-range" class="visually-hidden">Date Range</label>
+          <input
+            type="text"
+            id="date-range"
+            readonly
+            placeholder="日付範囲を選択"
+            title="日付範囲を選択"
+          />
         </div>
 
         <!-- Dropdown -->
-        <div class="me-2">
+        <div class="dropdown-user">
+          <label for="filter-dropdown" class="visually-hidden"
+            >Filter Options</label
+          >
           <select class="form-select" id="filter-dropdown">
-            <option value="all">All</option>
+            <option value="all">全員</option>
           </select>
         </div>
       </div>
       <div class="row mt-4">
-        <!-- Sidebar bên trái -->
+        <!-- Sidebar -->
         <div class="col-md-3 mb-3">
           <div class="card" id="summary-area" style="display: none">
             <div
-              class="summary-area card-body text-center d-flex justify-content-center flex-column"
+              id="summary"
+              class="shadow-box card-body text-center d-flex justify-content-center flex-column"
             >
-              <div class="" style="font-weight: bold">SUMMARY</div>
+              <div class="fw-bolder">要約</div>
               <!-- All Summary -->
               <div class="d-flex flex-column">
                 <div class="d-flex justify-content-between">
-                  <div>Number of User Submitted:</div>
-                  <div id="user-count">5</div>
+                  <div>ユーザー提出数:</div>
+                  <div id="user-count"></div>
                 </div>
 
                 <div class="d-flex justify-content-between">
-                  <div>Number of Report Submitted:</div>
-                  <div id="report-count">2</div>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                  <div>Submitted Status:</div>
-                  <div id="submitted-status">3/20</div>
+                  <div>報告書提出数:</div>
+                  <div id="report-count"></div>
                 </div>
               </div>
 
-              <hr />
+              <hr id="sum-divider" />
               <!-- Current Selected -->
-              <div class="d-flex flex-column">
-                <div id="selected-user-name" style="font-weight: bold">
-                  asdasdsadsa
+              <div id="current-selected-summary">
+                <div id="selected-user-name" style="font-weight: bold"></div>
+                <div class="d-flex justify-content-between">
+                  <div>報告書の数:</div>
+                  <div id="selected-report-count"></div>
                 </div>
                 <div class="d-flex justify-content-between">
-                  <div>Current User Submitted:</div>
-                  <div id="user-count">2</div>
+                  <div>
+                    <i class="fa-solid fa-sun sunny-color"></i>
+                  </div>
+                  <div id="sunny-report-count"></div>
                 </div>
 
                 <div class="d-flex justify-content-between">
                   <div>
-                    <i class="fa-solid fa-sun" style="color: #e0a800"></i>
+                    <i class="fa-solid fa-cloud cloudy-color"></i>
                   </div>
-                  <div id="report-count">2</div>
+                  <div id="cloudy-report-count"></div>
                 </div>
 
                 <div class="d-flex justify-content-between">
                   <div>
-                    <i
-                      class="fa-solid fa-cloud"
-                      style="color: rgb(153, 153, 247)"
-                    ></i>
+                    <i class="fa-solid fa-cloud-showers-water rainy-color"></i>
                   </div>
-                  <div id="submitted-status">3/20</div>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                  <div>
-                    <i
-                      class="fa-solid fa-cloud-showers-water"
-                      style="color: #b52a37"
-                    ></i>
-                  </div>
-                  <div id="submitted-status">4</div>
+                  <div id="rainy-report-count"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <!-- Main content bên phải -->
+        <!-- Main content -->
         <div class="col-md-9">
           <div id="main-content">
             <div class="card main-card" id="user-card" style="display: none">
-              <div class="card-body" style="padding: 0">
-                <!-- Email list sẽ render ở đây -->
+              <div class="card-body">
+                <!-- Email list -->
                 <div
                   id="profile_email"
                   style="display: none"
@@ -217,49 +214,7 @@
     <br />
     <br />
 
-    <!-- Modal -->
-    <div
-      class="modal fade"
-      id="exampleModal"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Set active account
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <ul class="list-group" id="list-group">
-              <li class="list-group-item" onclick="addAnotherAccount(event)">
-                Add another account
-              </li>
-            </ul>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              id="closeModal"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal xem chi tiết mail -->
+    <!-- Modal Mail Detail -->
     <div
       class="modal fade"
       id="mailDetailModal"
@@ -270,7 +225,7 @@
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="mailDetailModalLabel">Mail Detail</h5>
+            <h5 class="modal-title" id="mailDetailModalLabel">メール詳細</h5>
             <button
               type="button"
               class="btn-close"
@@ -279,7 +234,7 @@
             ></button>
           </div>
           <div class="modal-body" id="mail-detail-body">
-            <!-- Nội dung chi tiết sẽ được render ở đây -->
+            <!-- MAIL DETAIL BODY -->
           </div>
         </div>
       </div>
