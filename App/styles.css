@@ -346,9 +346,59 @@
   }
 }
 .litepicker .container__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 275px !important;
   padding: 10px 5px !important;
   margin: 0 !important;
-  width: 275px !important;
+}
+.litepicker .container__footer .preview-date-range {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 6px;
+  order: 1;
+  text-align-last: center;
+  font-size: 100%;
+}
+.litepicker .container__footer .button-cancel,
+.litepicker .container__footer .button-apply {
+  order: 2;
+  margin-left: 6px;
+}
+.litepicker .container__footer .button-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: flex-end;
+  order: 2;
+}
+/* Ẩn khoảng trắng nếu không có period */
+.litepicker
+  .container__footer:not(:has(.preview-date-range))
+  .button-container {
+  margin-top: 0;
+}
+.litepicker .container__days .day-item {
+  min-width: 32px;
+  max-width: 32px;
+  width: 32px;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.litepicker .container__footer .button-apply {
+  min-width: 40px !important;
+}
+.litepicker .container__days {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.litepicker .container__months {
+  min-width: 250px;
 }
 
 .company-logo {

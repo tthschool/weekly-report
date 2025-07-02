@@ -274,6 +274,22 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("date-range").value = "";
     filterMail();
   });
+
+  // Thêm vào sau khi khởi tạo Litepicker
+  picker.on("render", () => {
+    const footer = document.querySelector(".litepicker .container__footer");
+    if (footer) {
+      const btnApply = footer.querySelector(".button-apply");
+      const btnCancel = footer.querySelector(".button-cancel");
+      if (btnApply && btnCancel && !footer.querySelector(".button-container")) {
+        const btnContainer = document.createElement("div");
+        btnContainer.className = "button-container";
+        btnContainer.appendChild(btnCancel);
+        btnContainer.appendChild(btnApply);
+        footer.appendChild(btnContainer);
+      }
+    }
+  });
 });
 
 // ===================== USER SUMMARY AREA =====================
